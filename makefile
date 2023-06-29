@@ -1,5 +1,3 @@
-all: main
-	main
-
 main:
-	gcc *.c -o main -Wall
+	g++ src/k_combination.c src/prepare_input.c src/bhk.c src/main.c -o main -Wall
+	./main

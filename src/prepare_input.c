@@ -1,8 +1,8 @@
-#include "prepare_input.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include "../inc/prepare_input.h"
 
 float distance_between(float xi, float yi, float xj, float yj) {
     return sqrt(pow(xi - xj, 2) + pow(yi - yj, 2));
