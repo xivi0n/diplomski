@@ -32,8 +32,8 @@ void print_combination(unsigned int combination, int n) {
 }
 
 void generate_combinations(int n, int k) {
-    int combination = k_combination_init(k); // Initialize combination with the first k bits set to 1
-    int limit = k_combination_limit(n);           // Upper limit for the combinations
+    int combination = k_combination_init(k);
+    int limit = k_combination_limit(n);
     
     while (combination < limit) {
         print_binary(combination, n); printf(" ");

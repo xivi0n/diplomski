@@ -3,8 +3,21 @@
 #include <limits.h>
 #include <float.h>
 #include <string.h>
+#include <algorithm>
 #include "../inc/bhk.h"
 #include "../inc/k_combination.h"
+
+static inline unsigned int add_point(unsigned int state, int k) {
+    return state | (1 << k);
+}
+
+static inline int check_point(unsigned int state, int k) {
+    return state & (1 << k);
+}
+
+static inline unsigned int remove_point(unsigned int state, int k) {
+    return state & ~(1 << k);
+}
 
 void print_dp(float **dp, int state_count, int N) {
     unsigned int state_limit = k_combination_limit(N);
@@ -15,12 +28,8 @@ void print_dp(float **dp, int state_count, int N) {
         while (current_state < state_limit) {
             if (dp[current_state]) {
                 print_binary(current_state, N);printf("\t");
-                for (int j = 0; j < N; ++j) {
-                    if (dp[current_state][j] == FLT_MAX) {
-                        printf("x.xxxxxxxxxxx\t");
-                    } else {
-                        printf("%10.10f\t", dp[current_state][j]);
-                    }
+                for (int j = 0; j < i; ++j) {
+                    printf("%10.10f\t", dp[current_state][j]);
                 }
                 printf("\n");
             }
@@ -38,7 +47,7 @@ void print_nh(char **next_hop, int state_count, int N) {
         while (current_state < state_limit) {
             if (next_hop[current_state]) {
                 print_binary(current_state, N);printf("\t");
-                for (int j = 0; j < N; ++j) {
+                for (int j = 0; j < i; ++j) {
                     printf("%d\t", next_hop[current_state][j]);
                 }
                 printf("\n");
@@ -46,6 +55,17 @@ void print_nh(char **next_hop, int state_count, int N) {
             current_state = k_combination_next(current_state);
         }
     }
+}
+
+int find_k_one(unsigned int state, int count, int N) {
+    int place = -1;
+    int tmp = -1;
+    while (place < N) {
+        if (check_point(state, place)) tmp++;
+        if (count == tmp) break;
+        place += 1;
+    }
+    return place;
 }
 
 void print_path(int path[], int N) {
@@ -56,22 +76,9 @@ void print_path(int path[], int N) {
     printf("\n");
 }
 
-static inline unsigned int add_point(unsigned int state, int k) {
-    return state | (1 << k);
-}
-
-static inline int check_point(unsigned int state, int k) {
-    return state & (1 << k);
-}
-
-static inline unsigned int remove_point(unsigned int state, int k) {
-    return state & ~(1 << k);
-}
-
 static inline float* make_array(int N, float value) {
     float* arr = (float*) malloc(N * sizeof(float));
-    for (int i = 0; i < N; ++i)
-        arr[i] = value;
+    std::fill_n(arr, N, value);
     return arr;
 }
 
@@ -87,15 +94,16 @@ float bhk_tsp(float **distances, int N, int path[]) {
     unsigned int combination;
     float cost, tmp;
     char save_m;
+    int cnt_k, cnt_m;
 
     for (int i = 0; i < N - 1; ++i) {
         current_state = add_point(0, i);
         if (dp[current_state] == NULL) {
-            dp[current_state] = make_array(N - 1, FLT_MAX);
-            next_hop[current_state] = (char*) malloc((N - 1) * sizeof(char));
+            dp[current_state] = make_array(1, FLT_MAX);
+            next_hop[current_state] = (char*) malloc(1  * sizeof(char));
         }
-        dp[current_state][i] = distances[i + 1][0];
-        next_hop[current_state][i] = 0;
+        dp[current_state][0] = distances[i + 1][0];
+        next_hop[current_state][0] = 0;
     }
 
     // printf("\nINIT\n");
@@ -105,28 +113,31 @@ float bhk_tsp(float **distances, int N, int path[]) {
         current_state = k_combination_init(i);
         while (current_state < state_limit) {
             // printf("\n\ngenerating: ");print_binary(current_state, N - 1);printf("\n");
-            dp[current_state] = make_array(N - 1, FLT_MAX);
-            next_hop[current_state] = (char*) malloc((N - 1) * sizeof(char));
-
+            dp[current_state] = make_array(i, FLT_MAX);
+            next_hop[current_state] = (char*) malloc(i * sizeof(char));
+            cnt_k = 0;
             for (int k = 1; k < N; ++k) {
                 if (!check_point(current_state, k - 1)) continue;
                 combination = remove_point(current_state, k - 1);
                 cost = FLT_MAX;
+                cnt_m = 0;
                 for (int m = 1; m < N; ++m) {
                     if (!check_point(combination, m - 1) || k == m) continue;
-                    tmp = dp[combination][m - 1] + distances[m][k];
+                    tmp = dp[combination][cnt_m] + distances[m][k];
                     if (tmp < cost) {
                         cost = tmp;
-                        save_m = m;
+                        save_m = cnt_m;
                     }
+                    cnt_m++;
                 }
 
                 // printf("\nlast step: ");print_binary(combination, N - 1);printf("\n");
-                if (cost < dp[current_state][k - 1]) {
-                    dp[current_state][k - 1] = cost;
-                    next_hop[current_state][k - 1] = save_m;
-                    // printf("closest point: from %d to %d for %f\n", save_m, k, distances[save_m][k]);
+                if (cost < dp[current_state][cnt_k]) {
+                    dp[current_state][cnt_k] = cost;
+                    next_hop[current_state][cnt_k] = save_m;
+                    // printf("closest point: from %d to %d for %f\n", save_m, k, distances[save_m][cnt_k]);
                 }
+                cnt_k++;
                 // print_dp(dp, state_count, N - 1);
                 // print_nh(next_hop, state_count, N - 1);
             }
@@ -139,16 +150,16 @@ float bhk_tsp(float **distances, int N, int path[]) {
         cost = dp[current_state][i] + distances[0][i + 1];
         if (min_path > cost) {
             min_path = cost;
-            save_m = i + 1;
+            save_m = i;
         }
     }
 
     for (int i = N - 1; i > 0; --i) {
         path[i] = save_m + 1;
-        save_m = next_hop[current_state][save_m - 1];
-        current_state = remove_point(current_state, path[i] - 2);
+        save_m = find_k_one(current_state, next_hop[current_state][path[i] - 2], N - 1);
+        current_state = remove_point(current_state, path[i] - 1);
     }
-    path[0] = 1; 
+    path[0] = 0; 
 
     return min_path;
 }
