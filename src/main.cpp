@@ -7,10 +7,10 @@
 #include "../inc/prepare_input.h"
 #include "../inc/bhk.h"
 
-#define MAX_N 20
+#define MAX_N 28
 
 float **distances = NULL;
-char *filename = "input.txt";
+char *filename = "inputs/input2.txt";
 int N;
 int path[MAX_N];
 float min_path;

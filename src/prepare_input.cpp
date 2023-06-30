@@ -27,7 +27,7 @@ float** prepare_input(int MAX_N, char *filename, int *n) {
         printf("Error opening file\n");
         exit(1);
     }
-    char *separator = " ";
+    char *separator = " ,";
     char *line = (char*) malloc(100 * sizeof(char));
     int is_x = 1;
     while (fscanf(fp, "%[^\n]%*c", line) != EOF && *n < MAX_N) {

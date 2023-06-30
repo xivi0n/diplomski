@@ -5,7 +5,29 @@
 #include <string.h>
 #include <algorithm>
 #include "../inc/bhk.h"
-#include "../inc/k_combination.h"
+// #include "../inc/k_combination.h"
+
+void print_binary(unsigned int combination, int n) {
+    if (--n) {
+        print_binary(combination / 2, n);
+    }
+    printf("%d", combination % 2);
+}
+
+static inline unsigned int k_combination_init(int k) {
+    return (1 << k) - 1;
+}
+
+static inline unsigned int k_combination_limit(int n) {
+    return (1 << n);
+}
+
+static inline unsigned int k_combination_next(int combination) {
+    int x, y;
+    x = combination & -combination;
+    y = combination + x;
+    return (((combination & ~y) / x) >> 1) | y;
+}
 
 static inline unsigned int add_point(unsigned int state, int k) {
     return state | (1 << k);
@@ -57,15 +79,22 @@ void print_nh(char **next_hop, int state_count, int N) {
     }
 }
 
-int find_k_one(unsigned int state, int count, int N) {
-    int place = -1;
-    int tmp = -1;
-    while (place < N) {
-        if (check_point(state, place)) tmp++;
-        if (count == tmp) break;
-        place += 1;
+int find_k_one(unsigned int state, int N) {
+    int count = 0;
+    int position = 0;
+
+    while (state > 0) {
+        if (state & 1) {
+            count++;
+            if (count == N) {
+                return position;
+            }
+        }
+        state >>= 1;
+        position++;
     }
-    return place;
+
+    return -1;
 }
 
 void print_path(int path[], int N) {
@@ -155,11 +184,11 @@ float bhk_tsp(float **distances, int N, int path[]) {
     }
 
     for (int i = N - 1; i > 0; --i) {
-        path[i] = save_m + 1;
-        save_m = find_k_one(current_state, next_hop[current_state][path[i] - 2], N - 1);
-        current_state = remove_point(current_state, path[i] - 1);
+        path[i] = find_k_one(current_state, save_m + 1) + 2;
+        save_m = next_hop[current_state][save_m];
+        current_state = remove_point(current_state, path[i] - 2);
     }
-    path[0] = 0; 
+    path[0] = 1;
 
     return min_path;
 }
