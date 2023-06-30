@@ -3,6 +3,6 @@
 
 float bhk_tsp(float **distances, int N, int path[]);
 void print_path(int path[], int N);
-int find_k_one(unsigned int state, int N);
+int find_k_one(unsigned long long state, int N);
 
 #endif

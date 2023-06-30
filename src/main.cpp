@@ -21,6 +21,7 @@ int main() {
 
     for (N = 3; N <= MAX_N; ++N) {
         printf("N = %d\n", N);
+
         start = clock();
         min_path = bhk_tsp(distances, N, path);
         end = clock();

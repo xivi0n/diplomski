@@ -7,43 +7,43 @@
 #include "../inc/bhk.h"
 // #include "../inc/k_combination.h"
 
-void print_binary(unsigned int combination, int n) {
+void print_binary(unsigned long long combination, int n) {
     if (--n) {
         print_binary(combination / 2, n);
     }
     printf("%d", combination % 2);
 }
 
-static inline unsigned int k_combination_init(int k) {
+static inline unsigned long long k_combination_init(int k) {
     return (1 << k) - 1;
 }
 
-static inline unsigned int k_combination_limit(int n) {
+static inline unsigned long long k_combination_limit(int n) {
     return (1 << n);
 }
 
-static inline unsigned int k_combination_next(int combination) {
-    int x, y;
+static inline unsigned long long k_combination_next(unsigned long long combination) {
+    unsigned long long x, y;
     x = combination & -combination;
     y = combination + x;
     return (((combination & ~y) / x) >> 1) | y;
 }
 
-static inline unsigned int add_point(unsigned int state, int k) {
+static inline unsigned long long add_point(unsigned long long state, int k) {
     return state | (1 << k);
 }
 
-static inline int check_point(unsigned int state, int k) {
+static inline unsigned long long check_point(unsigned long long state, int k) {
     return state & (1 << k);
 }
 
-static inline unsigned int remove_point(unsigned int state, int k) {
+static inline unsigned long long remove_point(unsigned long long state, int k) {
     return state & ~(1 << k);
 }
 
-void print_dp(float **dp, int state_count, int N) {
-    unsigned int state_limit = k_combination_limit(N);
-    unsigned int current_state;
+void print_dp(float **dp, unsigned long long state_count, int N) {
+    unsigned long long state_limit = k_combination_limit(N);
+    unsigned long long current_state;
     printf("===============================\n");
     for (int i = 1; i < N + 1; ++i) {
         current_state = k_combination_init(i);
@@ -60,9 +60,9 @@ void print_dp(float **dp, int state_count, int N) {
     }
 }
 
-void print_nh(char **next_hop, int state_count, int N) {
-    unsigned int state_limit = k_combination_limit(N);
-    unsigned int current_state;
+void print_nh(char **next_hop, unsigned long long state_count, int N) {
+    unsigned long long state_limit = k_combination_limit(N);
+    unsigned long long current_state;
     printf("===============================\n");
     for (int i = 1; i < N + 1; ++i) {
         current_state = k_combination_init(i);
@@ -79,7 +79,7 @@ void print_nh(char **next_hop, int state_count, int N) {
     }
 }
 
-int find_k_one(unsigned int state, int N) {
+int find_k_one(unsigned long long state, int N) {
     int count = 0;
     int position = 0;
 
@@ -113,14 +113,14 @@ static inline float* make_array(int N, float value) {
 
 float bhk_tsp(float **distances, int N, int path[]) {
     float min_path = FLT_MAX;
-    int state_count = (1 << (N - 1));
+    unsigned long long state_count = (1 << (N - 1));
     float **dp = (float**) malloc(state_count * sizeof(float*));
     char **next_hop = (char**) malloc(state_count * sizeof(char *));
 
-    unsigned int current_state;
-    unsigned int calculation_state;
-    unsigned int state_limit = k_combination_limit(N - 1);
-    unsigned int combination;
+    unsigned long long current_state;
+    unsigned long long calculation_state;
+    unsigned long long state_limit = k_combination_limit(N - 1);
+    unsigned long long combination;
     float cost, tmp;
     char save_m;
     int cnt_k, cnt_m;
