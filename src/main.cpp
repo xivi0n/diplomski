@@ -7,7 +7,7 @@
 #include "../inc/prepare_input.h"
 #include "../inc/bhk.h"
 
-#define MAX_N 28
+#define MAX_N 29
 
 float **distances = NULL;
 char *filename = "inputs/input2.txt";

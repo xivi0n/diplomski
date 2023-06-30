@@ -11,7 +11,7 @@ void print_binary(unsigned long long combination, int n) {
     if (--n) {
         print_binary(combination / 2, n);
     }
-    printf("%d", combination % 2);
+    printf("%llu", combination % 2);
 }
 
 static inline unsigned long long k_combination_init(int k) {
@@ -41,7 +41,7 @@ static inline unsigned long long remove_point(unsigned long long state, int k) {
     return state & ~(1 << k);
 }
 
-void print_dp(float **dp, unsigned long long state_count, int N) {
+void print_dp(float **dp, int N) {
     unsigned long long state_limit = k_combination_limit(N);
     unsigned long long current_state;
     printf("===============================\n");
@@ -60,7 +60,7 @@ void print_dp(float **dp, unsigned long long state_count, int N) {
     }
 }
 
-void print_nh(char **next_hop, unsigned long long state_count, int N) {
+void print_nh(char **next_hop, int N) {
     unsigned long long state_limit = k_combination_limit(N);
     unsigned long long current_state;
     printf("===============================\n");
@@ -115,10 +115,9 @@ float bhk_tsp(float **distances, int N, int path[]) {
     float min_path = FLT_MAX;
     unsigned long long state_count = (1 << (N - 1));
     float **dp = (float**) malloc(state_count * sizeof(float*));
-    char **next_hop = (char**) malloc(state_count * sizeof(char *));
+    char **next_hop = (char**) malloc(state_count * sizeof(char*));
 
     unsigned long long current_state;
-    unsigned long long calculation_state;
     unsigned long long state_limit = k_combination_limit(N - 1);
     unsigned long long combination;
     float cost, tmp;
@@ -189,6 +188,18 @@ float bhk_tsp(float **distances, int N, int path[]) {
         current_state = remove_point(current_state, path[i] - 2);
     }
     path[0] = 1;
+
+    clock_t start, end;
+    start = clock();
+    for (current_state = 0; current_state < state_count; ++current_state) {
+        free(dp[current_state]);
+        free(next_hop[current_state]);
+    }
+
+    free(next_hop);
+    free(dp);
+    end = clock();
+    printf("Free time: %fs\n", 1.0 * (end - start) / CLOCKS_PER_SEC);
 
     return min_path;
 }
