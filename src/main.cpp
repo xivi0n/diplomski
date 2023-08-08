@@ -6,8 +6,9 @@
 #include <time.h>
 #include "../inc/prepare_input.h"
 #include "../inc/bhk.h"
+#include "../inc/btk.h"
 
-#define MAX_N 29
+#define MAX_N 25
 
 float **distances = NULL;
 char *filename = "inputs/input2.txt";
@@ -30,6 +31,17 @@ int main() {
         printf("Cost: %f\n", min_path);
         printf("Time: %fs\n", 1.0 * (end - start) / CLOCKS_PER_SEC);
         printf("=============================\n");
+
+        // memset(path, 0, MAX_N * sizeof(int));
+
+        // start = clock();
+        // min_path = btk_tsp(distances, N, path);
+        // end = clock();
+
+        // print_path(path, N);
+        // printf("Cost: %f\n", min_path);
+        // printf("Time: %fs\n", 1.0 * (end - start) / CLOCKS_PER_SEC);
+        // printf("=============================\n");
     }
     return 0;
 }
