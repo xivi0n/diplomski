@@ -1,6 +1,9 @@
 #include <queue>
 #include <float.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../inc/btk.h"
+#include <unordered_map>
 
 
 inline int count_ones(unsigned long long number) {
@@ -37,7 +40,7 @@ void print_binary_1(unsigned long long combination, int n) {
 struct Element {
     float path_cost;
     unsigned long long state;
-    char point;
+    short point;
 
     Element(float pc, unsigned long long s, char p) : 
         path_cost(pc), state(s), point(p) {}

@@ -8,17 +8,18 @@
 #include "../inc/bhk.h"
 #include "../inc/btk.h"
 
-#define MAX_N 25
+#define MAX_N 20
 
-float **distances = NULL;
-char *filename = "inputs/input2.txt";
+float **distances = NULL, **points = NULL;
+const char *filename = "inputs/_in263.txt";
 int N;
 int path[MAX_N];
 float min_path;
 clock_t start, end;
 
 int main() {
-    distances = prepare_input(MAX_N, filename, &N);
+    points = get_points(MAX_N, filename, &N);
+    distances = generate_distances(N, points);
 
     for (N = 3; N <= MAX_N; ++N) {
         printf("N = %d\n", N);

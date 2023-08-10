@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <float.h>
+#include <time.h>
 #include <string.h>
 #include <algorithm>
 #include "../inc/bhk.h"
@@ -115,21 +116,22 @@ float bhk_tsp(float **distances, int N, int path[]) {
     float min_path = FLT_MAX;
     unsigned long long state_count = (1 << (N - 1));
     float **dp = (float**) malloc(state_count * sizeof(float*));
-    char **next_hop = (char**) malloc(state_count * sizeof(char*));
+    short **next_hop = (short**) malloc(state_count * sizeof(char*));
+
+    memset(dp, NULL, state_count * sizeof(float*));
+    memset(next_hop, NULL, state_count * sizeof(char*));
 
     unsigned long long current_state;
     unsigned long long state_limit = k_combination_limit(N - 1);
     unsigned long long combination;
     float cost, tmp;
-    char save_m;
+    short save_m;
     int cnt_k, cnt_m;
 
     for (int i = 0; i < N - 1; ++i) {
         current_state = add_point(0, i);
-        if (dp[current_state] == NULL) {
-            dp[current_state] = make_array(1, FLT_MAX);
-            next_hop[current_state] = (char*) malloc(1  * sizeof(char));
-        }
+        dp[current_state] = make_array(1, FLT_MAX);
+        next_hop[current_state] = (short*) malloc(1  * sizeof(short));
         dp[current_state][0] = distances[i + 1][0];
         next_hop[current_state][0] = 0;
     }
@@ -142,7 +144,7 @@ float bhk_tsp(float **distances, int N, int path[]) {
         while (current_state < state_limit) {
             // printf("\n\ngenerating: ");print_binary(current_state, N - 1);printf("\n");
             dp[current_state] = make_array(i, FLT_MAX);
-            next_hop[current_state] = (char*) malloc(i * sizeof(char));
+            next_hop[current_state] = (short*) malloc(i * sizeof(short));
             cnt_k = 0;
             for (int k = 1; k < N; ++k) {
                 if (!check_point(current_state, k - 1)) continue;
